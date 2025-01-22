@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Bilder hochladen und klassifizieren</title>
+    <!-- Viewport meta tag for responsive design on mobile devices -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Bootstrap CSS -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <!-- Cropper.js CSS -->
+    <link
+        href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css"
+        rel="stylesheet"
+    >
+
+    <!-- Optional custom CSS file -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+
+    <style>
+        /* Light gray background for the body */
+        body {
+            background: #f9f9f9;
+        }
+
+        /* Heading styles */
+        h1 {
+            font-weight: 600;
+            color: #333;
+        }
+
+        /* Card layout for the upload form */
+        .upload-card {
+            background-color: #fff;
+            border: none;
+            border-radius: 8px;
+            -webkit-box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            padding: 2rem;
+        }
+
+        #cropper-container {
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        img {
+            max-width: 100%;
+        }
+
+        #croppedPreviewContainer {
+            display: none;
+            margin-top: 1.5rem;
+            text-align: center;
+        }
+
+        #croppedPreview {
+            max-width: 100%;
+            border: 2px solid #ccc;
+            border-radius: 6px;
+        }
+
+        .btn-primary, .btn-success {
+            border-radius: 25px;
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-5 mb-5">
+    <h1 class="text-center mb-4">Bilder hochladen &amp; klassifizieren</h1>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card upload-card">
+                {% if error %}
+                    <!-- Display an error message if any -->
+                    <div class="alert alert-danger" role="alert">
+                        {{ error }}
+                    </div>
+                {% endif %}
+
+                <!-- Form to upload the image -->
+                <form
+                    id="uploadForm"
+                    action="/"
+                    method="post"
+                    enctype="multipart/form-data"
+                    class="mb-3"
+                >
+                    <div class="mb-3">
+                        <label for="file" class="form-label">Wählen Sie ein Bild aus:</label>
+                        <input
+                            class="form-control"
+                            type="file"
+                            id="file"
+                            name="file"
+                            accept="image/*"
+                            capture="environment"
+                        >
+                    </div>
+
+                    <!-- Container for the Cropper.js instance -->
+                    <div id="cropper-container" style="display:none;">
+                        <img id="image" src="">
+                    </div>
+
+                    <!-- Button to trigger the cropping action -->
+                    <button
+                        type="button"
+                        id="cropButton"
+                        class="btn btn-success w-100 mb-2"
+                        style="display:none;"
+                    >
+                        Zuschneiden
+                    </button>
+
+                    <!-- Container & preview of the cropped image -->
+                    <div id="croppedPreviewContainer">
+                        <h5>Vorschau des zugeschnittenen Bildes:</h5>
+                        <img id="croppedPreview" src="" alt="Zugeschnittenes Bild">
+                    </div>
+
+                    <!-- Final upload button -->
+                    <button type="submit" class="btn btn-primary w-100 mt-3">
+                        Hochladen und analysieren
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Cropper.js JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
+<!-- Custom JavaScript code -->
+<script>
+    let cropper;
+    const fileInput = document.getElementById('file');
+    const image = document.getElementById('image');
+    const cropperContainer = document.getElementById('cropper-container');
+    const cropButton = document.getElementById('cropButton');
+    const uploadForm = document.getElementById('uploadForm');
+    const croppedPreviewContainer = document.getElementById('croppedPreviewContainer');
+    const croppedPreview = document.getElementById('croppedPreview');
+
+    /**
+     * Displays the image in the Cropper when a file is selected.
+     */
+    fileInput.addEventListener('change', function(event) {
+        const files = event.target.files;
+        if (files && files.length > 0) {
+            const file = files[0];
+            const url = URL.createObjectURL(file);
+
+            // Show the image container
+            image.src = url;
+            cropperContainer.style.display = 'block';
+            cropButton.style.display = 'block';
+
+            // Hide the cropped preview if a new image is selected
+            croppedPreviewContainer.style.display = 'none';
+
+            // Destroy any existing Cropper instance
+            if (cropper) {
+                cropper.destroy();
+            }
+
+            // Create a new Cropper with a free aspect ratio
+            cropper = new Cropper(image, {
+                aspectRatio: NaN,
+                viewMode: 1,
+            });
+        }
+    });
+
+    /**
+     * Triggered when "Zuschneiden" (crop) button is clicked.
+     * Crops the current image and updates the file input with the cropped result.
+     */
+    cropButton.addEventListener('click', function() {
+        if (!cropper) return;
+
+        // Get a canvas from the current crop
+        const canvas = cropper.getCroppedCanvas();
+
+        // Convert the canvas to a Blob (PNG)
+        canvas.toBlob(function(blob) {
+            if (!blob) return;
+
+            // Define a filename
+            const originalName = fileInput.files[0]?.name || 'bild.png';
+            const fileName = 'cropped_' + originalName;
+
+            // Create a new File object
+            const croppedFile = new File([blob], fileName, {
+                type: 'image/png',
+                lastModified: Date.now()
+            });
+
+            // Overwrite the file input with the cropped file
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(croppedFile);
+            fileInput.files = dataTransfer.files;
+
+            // Update the preview
+            const previewUrl = URL.createObjectURL(croppedFile);
+            croppedPreview.src = previewUrl;
+            croppedPreviewContainer.style.display = 'block';
+
+        }, 'image/png');
+    });
+</script>
+</body>
+</html>

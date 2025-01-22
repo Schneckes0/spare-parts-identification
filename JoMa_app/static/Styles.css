@@ -1,0 +1,132 @@
+/* Grundlegende Stile */
+body {
+    background-color: #f8f9fa; /* Helles Grau von Bootstrap */
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    color: #343a40;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+}
+
+p {
+    color: #343a40;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Bild und Cropper-Stile */
+#cropper-container {
+    max-width: 100%;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+#cropper-container img {
+    max-width: 100%;
+    display: block;
+    margin: 0 auto;
+}
+
+img {
+    border: 1px solid #dee2e6;
+    padding: 5px;
+    background-color: #fff;
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
+/* Buttons */
+.btn {
+    font-size: 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: 0.3rem;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+
+/* Input-Felder */
+.form-control {
+    font-size: 1rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.3rem;
+}
+
+/* Alert-Meldungen */
+.alert {
+    font-size: 1rem;
+}
+
+/* Liste der Vorhersagen */
+.list-group-item {
+    font-size: 1rem;
+}
+
+.badge {
+    font-size: 0.9rem;
+}
+
+/* Responsives Design */
+@media (max-width: 576px) {
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    .btn {
+        font-size: 0.9rem;
+        padding: 0.6rem 0.8rem;
+    }
+
+    .form-control {
+        font-size: 0.9rem;
+    }
+
+    .alert {
+        font-size: 0.9rem;
+    }
+
+    .list-group-item {
+        font-size: 0.9rem;
+    }
+
+    .badge {
+        font-size: 0.8rem;
+    }
+}
+
+/* Zusätzliche Stile für das Zuschneiden */
+#image {
+    max-width: 100%;
+}
+
+#cropButton {
+    margin-bottom: 1rem;
+}
+
+/* Footer (falls benötigt) */
+.footer {
+    background-color: #343a40;
+    color: #fff;
+    padding: 1rem 0;
+    text-align: center;
+    margin-top: 2rem;
+}
